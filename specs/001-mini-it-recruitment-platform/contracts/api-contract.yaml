@@ -1,0 +1,114 @@
+openapi: 3.0.3
+info:
+  title: Mini IT Recruitment Platform API
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /auth/register:
+    post:
+      summary: Register a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+      responses:
+        '201':
+          description: User created
+
+  /jobs:
+    get:
+      summary: List jobs with optional filters
+      parameters:
+        - name: city
+          in: query
+          schema:
+            type: string
+        - name: skill
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/JobPosting'
+    post:
+      summary: Create a new job posting
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Job created
+
+  /jobs/{jobId}/applications:
+    get:
+      summary: List applications for a job
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: List of applicants
+    post:
+      summary: Apply to a job
+      security:
+        - bearerAuth: []
+      responses:
+        '201':
+          description: Application created
+
+  /moderation/cases:
+    get:
+      summary: View moderation queue
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Moderation case list
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    RegisterRequest:
+      type: object
+      required: [email, password, fullName, role]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+        fullName:
+          type: string
+        role:
+          type: string
+          enum: [CANDIDATE, RECRUITER, MODERATOR, ADMIN]
+    JobPosting:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        location:
+          type: string
+        employmentType:
+          type: string
+        skillsRequired:
+          type: array
+          items:
+            type: string
+        status:
+          type: string
+    ApplicationStatus:
+      type: string
+      enum: [SUBMITTED, REVIEWED, INTERVIEW, OFFER, REJECTED]

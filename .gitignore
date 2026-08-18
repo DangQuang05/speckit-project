@@ -1,0 +1,27 @@
+# Node / frontend
+node_modules/
+frontend/node_modules/
+frontend/dist/
+frontend/build/
+frontend/.vite/
+frontend/coverage/
+*.log
+.env
+.env.*
+
+# Java / backend
+backend/target/
+backend/.gradle/
+backend/build/
+backend/*.log
+
+# OS/editor
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*.tmp
+
+# General
+coverage/
