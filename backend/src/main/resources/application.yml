@@ -24,6 +24,10 @@ server:
   servlet:
     context-path: /api
 
+auth:
+  session-secret: ${AUTH_SESSION_SECRET:change-me-in-development}
+  session-hours: 24
+
 logging:
   level:
     org.springframework.security: INFO

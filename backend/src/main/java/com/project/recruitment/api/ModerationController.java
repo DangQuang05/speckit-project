@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.project.recruitment.domain.User;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -25,10 +28,10 @@ public class ModerationController {
 
     @PostMapping("/reports")
     public ResponseEntity<ApiResponse<ModerationCase>> createReport(
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long reporterUserId,
+        @AuthenticationPrincipal User reporter,
         @Valid @RequestBody ModerationReportRequest request
     ) {
-        ModerationCase mc = moderationService.reportContent(reporterUserId, request);
+        ModerationCase mc = moderationService.reportContent(reporter.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.ok("Report submitted for review", mc));
     }
@@ -42,12 +45,13 @@ public class ModerationController {
     }
 
     @PatchMapping("/cases/{caseId}/resolve")
+    @PreAuthorize("hasRole('MODERATOR')")
     public ResponseEntity<ApiResponse<ModerationCase>> resolveCase(
         @PathVariable Long caseId,
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "3") Long moderatorUserId,
+        @AuthenticationPrincipal User moderator,
         @Valid @RequestBody ModerationResolutionRequest request
     ) {
-        ModerationCase mc = moderationService.resolveCase(moderatorUserId, caseId, request);
+        ModerationCase mc = moderationService.resolveCase(moderator.getId(), caseId, request);
         return ResponseEntity.ok(ApiResponse.ok("Case resolved successfully", mc));
     }
 }

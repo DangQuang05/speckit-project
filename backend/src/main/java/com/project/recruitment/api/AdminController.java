@@ -12,6 +12,8 @@ import com.project.recruitment.service.CompanyService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -36,14 +38,15 @@ public class AdminController {
     }
 
     @PatchMapping("/users/{userId}/status")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<User>> updateUserStatus(
         @PathVariable Long userId,
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "4") Long adminUserId,
+        @AuthenticationPrincipal User admin,
         @RequestBody UserStatusUpdateRequest request
     ) {
         User user = authService.updateUserStatus(userId, request.enabled());
         auditService.logAction(
-            adminUserId,
+            admin.getId(),
             "Admin",
             "USER_STATUS_CHANGE",
             "USER",
@@ -54,14 +57,15 @@ public class AdminController {
     }
 
     @PatchMapping("/users/{userId}/role")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<User>> updateUserRole(
         @PathVariable Long userId,
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "4") Long adminUserId,
+        @AuthenticationPrincipal User admin,
         @Valid @RequestBody UserRoleUpdateRequest request
     ) {
         User user = authService.updateUserRole(userId, request.role());
         auditService.logAction(
-            adminUserId,
+            admin.getId(),
             "Admin",
             "USER_ROLE_CHANGE",
             "USER",
@@ -78,14 +82,15 @@ public class AdminController {
     }
 
     @PatchMapping("/companies/{companyId}/verify")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ApiResponse<Company>> verifyCompany(
         @PathVariable Long companyId,
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "4") Long adminUserId,
+        @AuthenticationPrincipal User admin,
         @RequestParam(defaultValue = "true") boolean verified
     ) {
         Company company = companyService.setCompanyVerification(companyId, verified);
         auditService.logAction(
-            adminUserId,
+            admin.getId(),
             "Admin",
             "COMPANY_VERIFICATION",
             "COMPANY",

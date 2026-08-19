@@ -9,6 +9,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.project.recruitment.domain.User;
 
 import java.util.List;
 
@@ -25,10 +27,10 @@ public class JobApplicationController {
     @PostMapping("/jobs/{jobId}")
     public ResponseEntity<ApiResponse<JobApplication>> apply(
         @PathVariable Long jobId,
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long candidateUserId,
+        @AuthenticationPrincipal User currentUser,
         @RequestBody(required = false) JobApplicationRequest request
     ) {
-        JobApplication application = jobApplicationService.apply(candidateUserId, jobId, request);
+        JobApplication application = jobApplicationService.apply(currentUser.getId(), jobId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.ok("Applied successfully", application));
     }

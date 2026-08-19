@@ -11,6 +11,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.util.List;
 import java.util.Map;
@@ -28,12 +29,13 @@ public class CandidateProfileController {
     }
 
     @GetMapping("/profile/{userId}")
-    public ResponseEntity<ApiResponse<CandidateProfile>> getProfile(@PathVariable Long userId) {
-        CandidateProfile profile = candidateProfileService.getProfile(userId);
+    public ResponseEntity<ApiResponse<CandidateProfile>> getProfile(@PathVariable Long userId, @AuthenticationPrincipal com.project.recruitment.domain.User currentUser) {
+        ensureOwnUser(currentUser, userId);
+        CandidateProfile profile = candidateProfileService.getProfile(currentUser.getId());
         if (profile == null) {
             // Return empty skeleton profile for easy editing
             profile = new CandidateProfile();
-            profile.setUserId(userId);
+            profile.setUserId(currentUser.getId());
         }
         return ResponseEntity.ok(ApiResponse.ok(profile));
     }
@@ -41,36 +43,47 @@ public class CandidateProfileController {
     @PutMapping("/profile/{userId}")
     public ResponseEntity<ApiResponse<CandidateProfile>> upsertProfile(
         @PathVariable Long userId,
+        @AuthenticationPrincipal com.project.recruitment.domain.User currentUser,
         @Valid @RequestBody CandidateProfileRequest request
     ) {
-        CandidateProfile profile = candidateProfileService.upsertProfile(userId, request);
+        ensureOwnUser(currentUser, userId);
+        CandidateProfile profile = candidateProfileService.upsertProfile(currentUser.getId(), request);
         return ResponseEntity.ok(ApiResponse.ok("Profile updated successfully", profile));
     }
 
     @PutMapping("/preferences/{userId}")
     public ResponseEntity<ApiResponse<CandidateProfile>> updatePreferences(
         @PathVariable Long userId,
+        @AuthenticationPrincipal com.project.recruitment.domain.User currentUser,
         @RequestBody Map<String, String> body
     ) {
         String preferences = body.getOrDefault("preferences", "{}");
-        CandidateProfile profile = candidateProfileService.updateSavedPreferences(userId, preferences);
+        ensureOwnUser(currentUser, userId);
+        CandidateProfile profile = candidateProfileService.updateSavedPreferences(currentUser.getId(), preferences);
         return ResponseEntity.ok(ApiResponse.ok("Preferences saved successfully", profile));
     }
 
     @GetMapping("/applications/{userId}")
-    public ResponseEntity<ApiResponse<List<JobApplication>>> getApplications(@PathVariable Long userId) {
-        List<JobApplication> applications = jobApplicationService.getApplicationsByCandidateUser(userId);
+    public ResponseEntity<ApiResponse<List<JobApplication>>> getApplications(@PathVariable Long userId, @AuthenticationPrincipal com.project.recruitment.domain.User currentUser) {
+        ensureOwnUser(currentUser, userId);
+        List<JobApplication> applications = jobApplicationService.getApplicationsByCandidateUser(currentUser.getId());
         return ResponseEntity.ok(ApiResponse.ok(applications));
     }
 
     @PostMapping("/apply/{jobId}")
     public ResponseEntity<ApiResponse<JobApplication>> applyToJob(
         @PathVariable Long jobId,
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "1") Long candidateUserId,
+        @AuthenticationPrincipal com.project.recruitment.domain.User currentUser,
         @RequestBody(required = false) JobApplicationRequest request
     ) {
-        JobApplication application = jobApplicationService.apply(candidateUserId, jobId, request);
+        JobApplication application = jobApplicationService.apply(currentUser.getId(), jobId, request);
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ApiResponse.ok("Application submitted successfully", application));
+    }
+
+    private void ensureOwnUser(com.project.recruitment.domain.User currentUser, Long requestedUserId) {
+        if (!currentUser.getId().equals(requestedUserId)) {
+            throw new org.springframework.security.access.AccessDeniedException("Cannot access another user's profile");
+        }
     }
 }

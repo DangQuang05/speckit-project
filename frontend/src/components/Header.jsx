@@ -1,13 +1,6 @@
 import React from 'react';
 
-export default function Header({ currentRole, onRoleChange, currentUser, unreadCount, onToggleNotifications }) {
-  const roles = [
-    { id: 'CANDIDATE', label: '👤 Ứng viên (Candidate)' },
-    { id: 'RECRUITER', label: '🏢 Nhà tuyển dụng (Recruiter)' },
-    { id: 'MODERATOR', label: '🛡️ Kiểm duyệt (Moderator)' },
-    { id: 'ADMIN', label: '⚙️ Quản trị (Admin)' },
-  ];
-
+export default function Header({ currentRole, currentUser, unreadCount, onToggleNotifications, logoutControl }) {
   return (
     <header className="site-header">
       <div className="header-inner">
@@ -16,18 +9,7 @@ export default function Header({ currentRole, onRoleChange, currentUser, unreadC
           <span>TalentHub Việt Nam</span>
         </div>
 
-        <div className="role-switcher" role="tablist" aria-label="Role Switcher">
-          {roles.map((r) => (
-            <button
-              key={r.id}
-              type="button"
-              className={`role-btn ${currentRole === r.id ? 'active' : ''}`}
-              onClick={() => onRoleChange(r.id)}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
+        <div className="role-label" aria-label="Vai trò hiện tại">{currentRole}</div>
 
         <div className="header-actions">
           <button
@@ -42,6 +24,7 @@ export default function Header({ currentRole, onRoleChange, currentUser, unreadC
             <span className="user-avatar">{currentUser?.fullName?.charAt(0) || 'U'}</span>
             <span><strong>{currentUser?.fullName || 'User'}</strong></span>
           </div>
+          {logoutControl}
         </div>
       </div>
     </header>

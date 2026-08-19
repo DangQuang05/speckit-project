@@ -39,7 +39,7 @@ class AuthServiceTest {
             return u;
         });
 
-        User user = authService.register(new RegisterRequest("newcandidate@test.com", "pass12345", "Trần Bình", "0909998888", UserRole.CANDIDATE));
+        User user = authService.register(new RegisterRequest("newcandidate@test.com", "Pass12345!", "Trần Bình", "0909998888", UserRole.CANDIDATE));
         assertNotNull(user);
         assertEquals("newcandidate@test.com", user.getEmail());
         assertEquals(UserRole.CANDIDATE, user.getRole());
@@ -56,5 +56,31 @@ class AuthServiceTest {
         assertNotNull(res);
         assertEquals(5L, res.userId());
         assertEquals(UserRole.RECRUITER, res.role());
+    }
+
+    @Test
+    void shouldLockAccountAfterFiveFailedAttempts() {
+        User existing = new User("locked@test.com", "encodedPassword", "Locked User", UserRole.CANDIDATE);
+        when(userRepository.findByEmail("locked@test.com")).thenReturn(Optional.of(existing));
+        when(passwordEncoder.matches("WrongPass1!", "encodedPassword")).thenReturn(false);
+
+        for (int attempt = 0; attempt < 5; attempt++) {
+            assertThrows(IllegalArgumentException.class, () ->
+                authService.login(new LoginRequest("locked@test.com", "WrongPass1!")));
+        }
+
+        assertNotNull(existing.getLockedUntil());
+        IllegalStateException locked = assertThrows(IllegalStateException.class, () ->
+            authService.login(new LoginRequest("locked@test.com", "WrongPass1!")));
+        assertEquals("Account is temporarily locked. Please try again later.", locked.getMessage());
+    }
+
+    @Test
+    void shouldRejectRegistrationWithWeakPassword() {
+        when(userRepository.findByEmail("weak@test.com")).thenReturn(Optional.empty());
+
+        IllegalArgumentException error = assertThrows(IllegalArgumentException.class, () ->
+            authService.register(new RegisterRequest("weak@test.com", "password123", "Weak User", null, UserRole.CANDIDATE)));
+        assertTrue(error.getMessage().contains("uppercase"));
     }
 }

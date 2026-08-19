@@ -11,6 +11,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import com.project.recruitment.domain.User;
+import org.springframework.security.access.prepost.PreAuthorize;
 
 import java.util.List;
 
@@ -48,11 +51,12 @@ public class JobController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('RECRUITER')")
     public ResponseEntity<ApiResponse<JobPosting>> createJob(
-        @RequestHeader(value = "X-User-Id", required = false, defaultValue = "2") Long recruiterId,
+        @AuthenticationPrincipal User recruiter,
         @Valid @RequestBody JobPostingRequest request
     ) {
-        JobPosting job = jobService.createJob(recruiterId, request);
+        JobPosting job = jobService.createJob(recruiter.getId(), request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok("Job created successfully", job));
     }
 

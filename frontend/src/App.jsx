@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import Header from './components/Header';
+import LogoutControl from './components/LogoutControl';
+import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import CandidateView from './pages/CandidateView';
 import RecruiterView from './pages/RecruiterView';
 import ModeratorView from './pages/ModeratorView';
 import AdminView from './pages/AdminView';
 import NotificationsDrawer from './components/NotificationsDrawer';
 import Toast from './components/Toast';
-import { getNotifications, markNotificationAsRead } from './services/api';
-
-const USERS_BY_ROLE = {
-  CANDIDATE: { id: 1, email: 'candidate@talenthub.vn', fullName: 'Nguyễn Văn An (Candidate)', role: 'CANDIDATE' },
-  RECRUITER: { id: 2, email: 'recruiter@talenthub.vn', fullName: 'Trần Thị Mai (Recruiter)', role: 'RECRUITER' },
-  MODERATOR: { id: 3, email: 'moderator@talenthub.vn', fullName: 'Lê Hoàng Long (Moderator)', role: 'MODERATOR' },
-  ADMIN: { id: 4, email: 'admin@talenthub.vn', fullName: 'Phạm Minh Đức (Admin)', role: 'ADMIN' },
-};
+import { getNotifications, logoutUser, markNotificationAsRead, validateSession } from './services/api';
+import { clearAuthSession, readAuthSession, writeAuthSession } from './auth/authStorage';
+import ProtectedRoute from './auth/ProtectedRoute';
+import GuestRoute from './auth/GuestRoute';
 
 export default function App() {
-  const [currentRole, setCurrentRole] = useState('CANDIDATE');
-  const [currentUser, setCurrentUser] = useState(USERS_BY_ROLE.CANDIDATE);
+  const [session, setSession] = useState(() => readAuthSession());
+  const [isAuthLoading, setIsAuthLoading] = useState(() => Boolean(readAuthSession()));
+  const [sessionMessage, setSessionMessage] = useState('');
+  const [currentPath, setCurrentPath] = useState(() => window.location.pathname || '/');
   const [notifications, setNotifications] = useState([]);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
@@ -29,15 +30,9 @@ export default function App() {
     }, 3500);
   };
 
-  const handleRoleChange = (role) => {
-    setCurrentRole(role);
-    setCurrentUser(USERS_BY_ROLE[role] || USERS_BY_ROLE.CANDIDATE);
-    showToast(`Đã chuyển sang không gian: ${role}`);
-  };
-
   const loadNotifications = async () => {
     try {
-      const data = await getNotifications(currentUser.id);
+      const data = await getNotifications(session.userId);
       setNotifications(data || []);
     } catch (err) {
       console.error(err);
@@ -45,8 +40,78 @@ export default function App() {
   };
 
   useEffect(() => {
-    loadNotifications();
-  }, [currentUser.id]);
+    let isMounted = true;
+    const restoreSession = async () => {
+      if (!session?.token) {
+        setIsAuthLoading(false);
+        return;
+      }
+      try {
+        const restored = await validateSession(session.token);
+        if (isMounted) {
+          writeAuthSession(restored);
+          setSession(restored);
+        }
+      } catch {
+        clearAuthSession();
+        if (isMounted) {
+          setSession(null);
+          setSessionMessage('Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.');
+        }
+      } finally {
+        if (isMounted) setIsAuthLoading(false);
+      }
+    };
+    restoreSession();
+    return () => { isMounted = false; };
+  }, []);
+
+  useEffect(() => {
+    const handlePopState = () => setCurrentPath(window.location.pathname || '/');
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  function navigate(path) {
+    if (window.location.pathname !== path) {
+      window.history.pushState({}, '', path);
+    }
+    setCurrentPath(path);
+  }
+
+  useEffect(() => {
+    if (session?.userId) loadNotifications();
+    else setNotifications([]);
+  }, [session?.userId]);
+
+  useEffect(() => {
+    if (!isAuthLoading && !session && !['/login', '/register'].includes(currentPath)) {
+      window.history.replaceState({}, '', '/login');
+    }
+    if (!isAuthLoading && session && ['/login', '/register'].includes(currentPath)) {
+      window.history.replaceState({}, '', '/');
+    }
+  }, [currentPath, isAuthLoading, session]);
+
+  const handleAuthenticated = (authenticatedSession) => {
+    writeAuthSession(authenticatedSession);
+    setSession(authenticatedSession);
+    setSessionMessage('');
+  };
+
+  const handleLogout = async () => {
+    const token = session?.token;
+    try {
+      if (token) await logoutUser(token);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      clearAuthSession();
+      setSession(null);
+      navigate('/login');
+      setSessionMessage('Bạn đã đăng xuất thành công.');
+    }
+  };
 
   const handleMarkAsRead = async (id) => {
     try {
@@ -61,14 +126,31 @@ export default function App() {
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
+  if (isAuthLoading) {
+    return <main className="auth-page"><p role="status">Đang kiểm tra phiên đăng nhập...</p></main>;
+  }
+
+  if (!session) {
+    const requestedAuthView = currentPath === '/register' ? 'register' : 'login';
+    return <GuestRoute session={session} onAuthenticated={() => navigate('/')}>
+      {requestedAuthView === 'login'
+        ? <LoginPage onAuthenticated={(authenticatedSession) => { handleAuthenticated(authenticatedSession); navigate('/'); }} onRegister={() => { setSessionMessage(''); navigate('/register'); }} sessionMessage={sessionMessage} />
+        : <RegisterPage onAuthenticated={(authenticatedSession) => { handleAuthenticated(authenticatedSession); navigate('/'); }} onLogin={() => { setSessionMessage(''); navigate('/login'); }} />}
+    </GuestRoute>;
+  }
+
+  const currentRole = session.role;
+  const currentUser = session;
+
   return (
+    <ProtectedRoute session={session} onUnauthenticated={() => navigate('/login')}>
     <div className="app-container">
       <Header
         currentRole={currentRole}
-        onRoleChange={handleRoleChange}
         currentUser={currentUser}
         unreadCount={unreadCount}
         onToggleNotifications={() => setIsNotificationsOpen(!isNotificationsOpen)}
+        logoutControl={<LogoutControl onLogout={handleLogout} />}
       />
 
       <main className="main-content">
@@ -95,5 +177,6 @@ export default function App() {
 
       <Toast message={toastMessage} />
     </div>
+    </ProtectedRoute>
   );
 }

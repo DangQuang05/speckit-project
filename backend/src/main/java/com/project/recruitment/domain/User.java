@@ -29,6 +29,11 @@ public class User {
     private boolean enabled = true;
 
     @Column(nullable = false)
+    private int failedLoginAttempts = 0;
+
+    private LocalDateTime lockedUntil;
+
+    @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
 
     private LocalDateTime updatedAt = LocalDateTime.now();
@@ -66,6 +71,12 @@ public class User {
 
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public int getFailedLoginAttempts() { return failedLoginAttempts; }
+    public void setFailedLoginAttempts(int failedLoginAttempts) { this.failedLoginAttempts = failedLoginAttempts; }
+
+    public LocalDateTime getLockedUntil() { return lockedUntil; }
+    public void setLockedUntil(LocalDateTime lockedUntil) { this.lockedUntil = lockedUntil; }
 
     public LocalDateTime getCreatedAt() { return createdAt; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

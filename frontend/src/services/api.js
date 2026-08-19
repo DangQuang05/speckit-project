@@ -1,3 +1,5 @@
+import { getAuthToken } from '../auth/authStorage';
+
 const API_BASE_URL = 'http://localhost:8080/api';
 
 // Fallback in-memory state if backend is unreachable during client-side demo
@@ -166,10 +168,12 @@ let mockNotifications = [
 
 async function apiFetch(endpoint, options = {}) {
   try {
+    const token = getAuthToken();
     const res = await fetch(`${API_BASE_URL}${endpoint}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
         ...options.headers,
       },
     });
@@ -186,39 +190,50 @@ async function apiFetch(endpoint, options = {}) {
   }
 }
 
+async function authFetch(endpoint, options = {}) {
+  const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+  const body = await response.json().catch(() => null);
+  if (!response.ok) {
+    const error = new Error(body?.message || 'Authentication request failed');
+    error.status = response.status;
+    error.details = body?.data;
+    throw error;
+  }
+  return body?.data !== undefined ? body.data : body;
+}
+
 // ----------------- Auth API -----------------
 export async function loginUser(email, password) {
-  const result = await apiFetch('/auth/login', {
+  return authFetch('/auth/login', {
     method: 'POST',
     body: JSON.stringify({ email, password }),
   });
-  if (result) return result;
-
-  const found = mockUsers.find(u => u.email.toLowerCase() === email.toLowerCase());
-  if (found) {
-    return { token: 'mock-token', userId: found.id, email: found.email, fullName: found.fullName, role: found.role };
-  }
-  throw new Error('Email hoặc mật khẩu không chính xác');
 }
 
 export async function registerCandidate(payload) {
-  const result = await apiFetch('/auth/register', {
+  return authFetch('/auth/register', {
     method: 'POST',
     body: JSON.stringify(payload),
   });
-  if (result) return result;
+}
 
-  const newUser = {
-    id: mockUsers.length + 1,
-    email: payload.email,
-    fullName: payload.fullName,
-    role: payload.role || 'CANDIDATE',
-    enabled: true,
-    phoneNumber: payload.phoneNumber || '',
-    createdAt: new Date().toISOString(),
-  };
-  mockUsers.push(newUser);
-  return newUser;
+export async function validateSession(token) {
+  return authFetch('/auth/session', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
+export async function logoutUser(token) {
+  return authFetch('/auth/logout', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 // ----------------- Jobs API -----------------
