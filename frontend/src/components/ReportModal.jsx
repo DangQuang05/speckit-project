@@ -34,17 +34,18 @@ export default function ReportModal({ target, onClose, onSubmit }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
-          <h2 style={{ fontSize: '1.2rem' }}>🚩 Báo cáo nội dung vi phạm</h2>
-          <button type="button" className="modal-close-btn" onClick={onClose}>&times;</button>
+          <div>
+            <h2>Báo cáo nội dung vi phạm</h2>
+            <p>
+              Báo cáo tin tuyển dụng: <strong>{target.title}</strong> tại {target.companyName}
+            </p>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Đóng">&times;</button>
         </div>
 
-        <p style={{ fontSize: '0.9rem', color: 'var(--text-muted)' }}>
-          Bạn đang báo cáo tin tuyển dụng: <strong>{target.title}</strong> tại <strong>{target.companyName}</strong>
-        </p>
-
         {error && (
-          <div className="badge badge-danger" style={{ padding: '8px', borderRadius: '6px' }}>
-            ⚠️ {error}
+          <div className="auth-alert" role="alert">
+            {error}
           </div>
         )}
 
@@ -56,7 +57,7 @@ export default function ReportModal({ target, onClose, onSubmit }) {
               rows={4}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
-              placeholder="VD: Tin tuyển dụng giả mạo, yêu cầu thu phí trái quy định, thông tin sai sự thật..."
+              placeholder="Mô tả lý do: tin tuyển dụng không đúng thực tế, yêu cầu thu phí trái quy định, thông tin sai sự thật..."
               required
             />
           </div>
@@ -66,7 +67,7 @@ export default function ReportModal({ target, onClose, onSubmit }) {
               Hủy
             </button>
             <button type="submit" className="btn btn-danger" disabled={submitting}>
-              {submitting ? 'Đang gửi...' : 'Gửi báo cáo cho Kiểm duyệt viên'}
+              {submitting ? 'Đang gửi...' : 'Gửi báo cáo cho Kiểm duyệt'}
             </button>
           </div>
         </form>
@@ -74,3 +75,4 @@ export default function ReportModal({ target, onClose, onSubmit }) {
     </div>
   );
 }
+

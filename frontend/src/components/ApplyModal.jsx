@@ -32,17 +32,17 @@ export default function ApplyModal({ job, profile, onClose, onSubmit }) {
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
-            <h2 style={{ fontSize: '1.2rem' }}>Ứng tuyển: {job.title}</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-              Doanh nghiệp: <strong>{job.companyName}</strong> ({job.location})
+            <h2>Ứng tuyển: {job.title}</h2>
+            <p>
+              Doanh nghiệp: {job.companyName} ({job.location})
             </p>
           </div>
-          <button type="button" className="modal-close-btn" onClick={onClose}>&times;</button>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Đóng">&times;</button>
         </div>
 
         {error && (
-          <div className="badge badge-danger" style={{ padding: '8px 12px', borderRadius: '8px' }}>
-            ⚠️ {error}
+          <div className="auth-alert" role="alert">
+            {error}
           </div>
         )}
 
@@ -50,16 +50,16 @@ export default function ApplyModal({ job, profile, onClose, onSubmit }) {
           <div className="form-group">
             <label className="form-label">Link CV trực tuyến (*)</label>
             <input
-              type="text"
+              type="url"
               className="form-input"
               value={cvUrl}
               onChange={(e) => setCvUrl(e.target.value)}
               placeholder="https://cv.talenthub.vn/your-cv.pdf"
               required
             />
-            <small style={{ color: 'var(--text-muted)' }}>
-              📄 Đã chọn từ hồ sơ cá nhân của bạn. Bạn có thể thay đổi đường dẫn CV riêng cho vị trí này.
-            </small>
+            <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+              Đã điền tự động từ hồ sơ của bạn. Bạn có thể thay đổi link cho vị trí này.
+            </span>
           </div>
 
           <div className="form-group">
@@ -97,3 +97,4 @@ export default function ApplyModal({ job, profile, onClose, onSubmit }) {
     </div>
   );
 }
+

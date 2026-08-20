@@ -128,7 +128,23 @@
 
 ---
 
+## Phase 8: Frontend UI Redesign & Minimalist Taste Skill Compliance
+
+**Purpose**: Modernize the entire frontend user interface following the 3 Taste Skill principles (`design-taste-frontend`, `minimalist-ui`, `redesign-existing-projects`).
+
+- [X] T052 [P] Establish minimalist design tokens and CSS custom properties in `frontend/src/index.css` (neutral scale `#fafafa`/`#ffffff`/`#e5e5e5`, accent `#2563eb`, semantic badges, segment tabs, backdrop modals).
+- [X] T053 [P] Clean up legacy/unused layout styles in `frontend/src/App.css` and align with `index.css`.
+- [X] T054 [P] Redesign header and toast components (`frontend/src/components/Header.jsx`, `frontend/src/components/Toast.jsx`) removing emoji clutter and applying crisp minimalist styling.
+- [X] T055 [P] Redesign job cards and modals (`frontend/src/components/JobCard.jsx`, `JobDetailModal.jsx`, `ApplyModal.jsx`, `ReportModal.jsx`, `NotificationsDrawer.jsx`) replacing inline styles with design system classes.
+- [X] T056 [P] Redesign candidate view (`frontend/src/pages/CandidateView.jsx`) with segment tabs, filter chip controls, clean empty states, and applications table.
+- [X] T057 [P] Redesign recruiter view (`frontend/src/pages/RecruiterView.jsx`) with minimalist stat cards, clean job management table, pipeline workflow, and candidate review modal.
+- [X] T058 [P] Redesign moderator and admin views (`frontend/src/pages/ModeratorView.jsx`, `frontend/src/pages/AdminView.jsx`) with filter chips, governance tables, verification toggles, and resolution dialogs.
+- [X] T059 [P] Update specification and planning documents (`specs/001-mini-it-recruitment-platform/spec.md`, `plan.md`, `tasks.md`) to reflect the UI/UX design system while preserving `constitution.md`.
+
+---
+
 ## Dependencies & Execution Order
+
 
 ### Phase Dependencies
 

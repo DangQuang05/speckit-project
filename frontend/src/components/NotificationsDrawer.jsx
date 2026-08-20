@@ -7,43 +7,49 @@ export default function NotificationsDrawer({ isOpen, onClose, notifications, on
     <div className="modal-overlay" onClick={onClose}>
       <div
         className="modal-card"
-        style={{ maxWidth: '480px', position: 'absolute', top: '70px', right: '20px', maxHeight: '500px' }}
+        style={{ maxWidth: '440px', position: 'fixed', top: '64px', right: '20px', maxHeight: '520px' }}
         onClick={(e) => e.stopPropagation()}
       >
         <div className="modal-header">
-          <h3 style={{ fontSize: '1.1rem' }}>🔔 Thông báo hệ thống</h3>
-          <button type="button" className="modal-close-btn" onClick={onClose}>&times;</button>
+          <div>
+            <h3>Thông báo hệ thống</h3>
+            <p>Cập nhật trạng thái ứng tuyển và tin tuyển dụng</p>
+          </div>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Đóng">&times;</button>
         </div>
 
         {notifications.length === 0 ? (
-          <p style={{ textAlign: 'center', color: 'var(--text-muted)', padding: '24px 0' }}>
-            Chưa có thông báo nào.
-          </p>
+          <div className="empty-state">
+            <h3>Chưa có thông báo nào</h3>
+            <p>Các cập nhật về hồ sơ và tin tuyển dụng sẽ xuất hiện tại đây.</p>
+          </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', overflowY: 'auto' }}>
             {notifications.map((n) => (
               <div
                 key={n.id}
                 style={{
-                  padding: '12px',
-                  borderRadius: 'var(--radius-md)',
-                  background: n.read ? 'var(--bg)' : 'var(--primary-light)',
-                  border: '1px solid var(--border)',
+                  padding: '12px 14px',
+                  borderRadius: 'var(--radius-sm)',
+                  background: n.read ? 'var(--surface-subtle)' : '#ffffff',
+                  border: '1px solid',
+                  borderColor: n.read ? 'var(--border)' : 'var(--primary-border)',
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   gap: '4px',
+                  transition: 'background-color 0.15s ease',
                 }}
                 onClick={() => onMarkAsRead(n.id)}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <strong style={{ fontSize: '0.9rem', color: 'var(--text-main)' }}>{n.title}</strong>
-                  {!n.read && <span className="badge badge-primary" style={{ fontSize: '0.65rem' }}>Mới</span>}
+                  <strong style={{ fontSize: '0.8125rem', color: 'var(--text-main)' }}>{n.title}</strong>
+                  {!n.read && <span className="badge badge-primary">Mới</span>}
                 </div>
-                <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{n.message}</p>
-                <small style={{ fontSize: '0.75rem', color: '#94a3b8' }}>
+                <p style={{ fontSize: '0.75rem', color: 'var(--text-secondary)', lineHeight: '1.5' }}>{n.message}</p>
+                <span style={{ fontSize: '0.6875rem', color: 'var(--text-muted)' }}>
                   {new Date(n.createdAt).toLocaleTimeString('vi-VN')} {new Date(n.createdAt).toLocaleDateString('vi-VN')}
-                </small>
+                </span>
               </div>
             ))}
           </div>
@@ -52,3 +58,4 @@ export default function NotificationsDrawer({ isOpen, onClose, notifications, on
     </div>
   );
 }
+

@@ -8,7 +8,7 @@ import {
 } from '../services/api';
 
 export default function RecruiterView({ currentUser, onShowToast }) {
-  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'post-job' | 'applicants' | 'company'
+  const [activeTab, setActiveTab] = useState('overview'); // 'overview' | 'post-job' | 'applicants'
   const [jobs, setJobs] = useState([]);
   const [applications, setApplications] = useState([]);
   const [selectedJobIdFilter, setSelectedJobIdFilter] = useState('');
@@ -56,7 +56,7 @@ export default function RecruiterView({ currentUser, onShowToast }) {
   const handlePostJob = async (e) => {
     e.preventDefault();
     if (!jobForm.title.trim() || !jobForm.description.trim()) {
-      onShowToast('⚠️ Vui lòng điền đầy đủ tiêu đề và mô tả công việc.');
+      onShowToast('Vui lòng điền đầy đủ tiêu đề và mô tả công việc.');
       return;
     }
     try {
@@ -69,7 +69,7 @@ export default function RecruiterView({ currentUser, onShowToast }) {
         requirements: reqsArray,
       }, currentUser.id);
 
-      onShowToast('✓ Đăng tin tuyển dụng thành công!');
+      onShowToast('Đăng tin tuyển dụng thành công');
       setJobForm({
         title: '',
         location: 'Hồ Chí Minh',
@@ -86,7 +86,7 @@ export default function RecruiterView({ currentUser, onShowToast }) {
       setActiveTab('overview');
       loadData();
     } catch (err) {
-      onShowToast('⚠️ ' + (err.message || 'Lỗi đăng tin'));
+      onShowToast(err.message || 'Lỗi đăng tin');
     }
   };
 
@@ -94,22 +94,22 @@ export default function RecruiterView({ currentUser, onShowToast }) {
     const nextStatus = currentStatus === 'ACTIVE' ? 'CLOSED' : 'ACTIVE';
     try {
       await updateJobStatus(jobId, nextStatus);
-      onShowToast(`✓ Đã chuyển trạng thái tin sang ${nextStatus}`);
+      onShowToast(`Đã chuyển trạng thái tin sang ${nextStatus}`);
       loadData();
     } catch (err) {
-      onShowToast('⚠️ ' + (err.message || 'Lỗi cập nhật trạng thái'));
+      onShowToast(err.message || 'Lỗi cập nhật trạng thái');
     }
   };
 
   const handleAdvanceStatus = async (applicationId, nextStatus) => {
     try {
       await updateApplicationStatus(applicationId, nextStatus, statusFeedback);
-      onShowToast(`✓ Đã chuyển ứng viên sang giai đoạn: ${nextStatus}`);
+      onShowToast(`Đã chuyển ứng viên sang giai đoạn: ${nextStatus}`);
       setStatusFeedback('');
       setSelectedApplicant(null);
       loadData();
     } catch (err) {
-      onShowToast('⚠️ ' + (err.message || 'Lỗi cập nhật'));
+      onShowToast(err.message || 'Lỗi cập nhật');
     }
   };
 
@@ -129,21 +129,21 @@ export default function RecruiterView({ currentUser, onShowToast }) {
           className={`tab-btn ${activeTab === 'overview' ? 'active' : ''}`}
           onClick={() => setActiveTab('overview')}
         >
-          📊 Tổng quan tuyển dụng
+          Tổng quan tuyển dụng
         </button>
         <button
           type="button"
           className={`tab-btn ${activeTab === 'applicants' ? 'active' : ''}`}
           onClick={() => setActiveTab('applicants')}
         >
-          👥 Ứng viên nộp hồ sơ ({applications.length})
+          Ứng viên nộp hồ sơ ({applications.length})
         </button>
         <button
           type="button"
           className={`tab-btn ${activeTab === 'post-job' ? 'active' : ''}`}
           onClick={() => setActiveTab('post-job')}
         >
-          ➕ Đăng tin tuyển dụng mới
+          Đăng tin tuyển dụng
         </button>
       </nav>
 
@@ -156,32 +156,35 @@ export default function RecruiterView({ currentUser, onShowToast }) {
               <span className="stat-label">Tổng số tin đã đăng</span>
             </div>
             <div className="stat-card">
-              <span className="stat-num" style={{ color: 'var(--success)' }}>{activeJobsCount}</span>
-              <span className="stat-label">Tin đang tuyển (Active)</span>
+              <span className="stat-num">{activeJobsCount}</span>
+              <span className="stat-label">Tin đang tuyển</span>
             </div>
             <div className="stat-card">
-              <span className="stat-num" style={{ color: 'var(--primary)' }}>{applications.length}</span>
+              <span className="stat-num">{applications.length}</span>
               <span className="stat-label">Tổng hồ sơ ứng viên</span>
             </div>
             <div className="stat-card">
-              <span className="stat-num" style={{ color: 'var(--warning)' }}>{interviewCount}</span>
+              <span className="stat-num">{interviewCount}</span>
               <span className="stat-label">Đang phỏng vấn</span>
             </div>
             <div className="stat-card">
-              <span className="stat-num" style={{ color: 'var(--purple)' }}>{offerCount}</span>
+              <span className="stat-num">{offerCount}</span>
               <span className="stat-label">Đã gửi Offer</span>
             </div>
           </div>
 
           <div className="card" style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
-              <h3>Danh sách tin tuyển dụng của công ty</h3>
+            <div className="card-header">
+              <div>
+                <h3>Danh sách tin tuyển dụng</h3>
+                <p>Quản lý các vị trí tuyển dụng của công ty</p>
+              </div>
               <button
                 type="button"
                 className="btn btn-primary btn-sm"
                 onClick={() => setActiveTab('post-job')}
               >
-                + Đăng tin mới
+                Đăng tin mới
               </button>
             </div>
 
@@ -204,12 +207,12 @@ export default function RecruiterView({ currentUser, onShowToast }) {
                       <tr key={job.id}>
                         <td>
                           <strong>{job.title}</strong>
-                          <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
                             {job.skillsRequired?.join(', ')}
                           </div>
                         </td>
                         <td>{job.location}</td>
-                        <td><span className="job-salary-badge" style={{ fontSize: '0.85rem' }}>{job.salaryText}</span></td>
+                        <td><span className="job-salary-badge">{job.salaryText}</span></td>
                         <td>
                           <span className={`badge ${job.status === 'ACTIVE' ? 'badge-success' : job.status === 'REJECTED' ? 'badge-danger' : 'badge-neutral'}`}>
                             {job.status === 'ACTIVE' ? 'Đang tuyển' : job.status === 'REJECTED' ? 'Bị từ chối' : 'Đã đóng'}
@@ -224,7 +227,7 @@ export default function RecruiterView({ currentUser, onShowToast }) {
                               setActiveTab('applicants');
                             }}
                           >
-                            👤 {appsForThisJob} hồ sơ
+                            {appsForThisJob} hồ sơ
                           </button>
                         </td>
                         <td>
@@ -250,19 +253,19 @@ export default function RecruiterView({ currentUser, onShowToast }) {
       {activeTab === 'applicants' && (
         <section>
           <div className="card" style={{ marginBottom: '20px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px' }}>
+            <div className="card-header" style={{ flexWrap: 'wrap' }}>
               <div>
                 <h2>Hồ sơ ứng viên tuyển dụng ({filteredApplications.length})</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                <p>
                   Xét duyệt ứng viên, xem CV và chuyển đổi các giai đoạn tuyển dụng.
                 </p>
               </div>
 
               <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <label style={{ fontSize: '0.85rem', fontWeight: 600 }}>Lọc theo vị trí:</label>
+                <label style={{ fontSize: '0.8125rem', fontWeight: 500 }}>Lọc vị trí:</label>
                 <select
                   className="form-select"
-                  style={{ width: 'auto' }}
+                  style={{ width: 'auto', padding: '6px 10px', fontSize: '0.8125rem' }}
                   value={selectedJobIdFilter}
                   onChange={(e) => setSelectedJobIdFilter(e.target.value)}
                 >
@@ -276,9 +279,9 @@ export default function RecruiterView({ currentUser, onShowToast }) {
           </div>
 
           {filteredApplications.length === 0 ? (
-            <div className="card" style={{ textAlign: 'center', padding: '40px' }}>
+            <div className="card empty-state">
               <h3>Chưa có hồ sơ ứng tuyển nào</h3>
-              <p style={{ color: 'var(--text-muted)', marginTop: '8px' }}>
+              <p>
                 Khi có ứng viên nộp CV cho các vị trí đang tuyển, thông tin sẽ xuất hiện tại đây.
               </p>
             </div>
@@ -290,9 +293,9 @@ export default function RecruiterView({ currentUser, onShowToast }) {
                     <th>Tên ứng viên</th>
                     <th>Vị trí ứng tuyển</th>
                     <th>Ngày nộp</th>
-                    <th>Giai đoạn hiện tại</th>
+                    <th>Giai đoạn</th>
                     <th>CV đính kèm</th>
-                    <th>Xét duyệt & Chuyển giai đoạn</th>
+                    <th>Thao tác</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -300,7 +303,7 @@ export default function RecruiterView({ currentUser, onShowToast }) {
                     <tr key={app.id}>
                       <td>
                         <strong>{app.candidateName}</strong>
-                        <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>{app.candidateEmail}</div>
+                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{app.candidateEmail}</div>
                       </td>
                       <td>{app.jobTitle}</td>
                       <td>{new Date(app.submittedAt).toLocaleDateString('vi-VN')}</td>
@@ -323,20 +326,18 @@ export default function RecruiterView({ currentUser, onShowToast }) {
                             className="badge badge-neutral"
                             style={{ textDecoration: 'underline' }}
                           >
-                            📄 Xem CV
+                            Xem CV
                           </a>
                         ) : 'Chưa gửi'}
                       </td>
                       <td>
-                        <div style={{ display: 'flex', gap: '6px' }}>
-                          <button
-                            type="button"
-                            className="btn btn-secondary btn-sm"
-                            onClick={() => setSelectedApplicant(app)}
-                          >
-                            Chi tiết & Đánh giá
-                          </button>
-                        </div>
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => setSelectedApplicant(app)}
+                        >
+                          Chi tiết & Đánh giá
+                        </button>
                       </td>
                     </tr>
                   ))}
@@ -351,10 +352,14 @@ export default function RecruiterView({ currentUser, onShowToast }) {
       {activeTab === 'post-job' && (
         <section>
           <div className="card">
-            <h2>Đăng tin tuyển dụng IT</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', marginBottom: '20px' }}>
-              Tạo vị trí tuyển dụng mới với đầy đủ thông tin chuẩn thị trường IT Việt Nam.
-            </p>
+            <div className="card-header">
+              <div>
+                <h2>Đăng tin tuyển dụng</h2>
+                <p>
+                  Tạo vị trí tuyển dụng mới với đầy đủ thông tin chuẩn thị trường IT.
+                </p>
+              </div>
+            </div>
 
             <form onSubmit={handlePostJob} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
               <div className="form-group">
@@ -417,7 +422,7 @@ export default function RecruiterView({ currentUser, onShowToast }) {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Mức lương hiển thị (VND)</label>
+                  <label className="form-label">Mức lương hiển thị</label>
                   <input
                     type="text"
                     className="form-input"
@@ -429,7 +434,7 @@ export default function RecruiterView({ currentUser, onShowToast }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Kỹ năng công nghệ yêu cầu (phân tách bởi dấu phẩy) (*)</label>
+                <label className="form-label">Kỹ năng yêu cầu (phân tách bởi dấu phẩy) (*)</label>
                 <input
                   type="text"
                   className="form-input"
@@ -441,13 +446,13 @@ export default function RecruiterView({ currentUser, onShowToast }) {
               </div>
 
               <div className="form-group">
-                <label className="form-label">Mô tả công việc (Job Description) (*)</label>
+                <label className="form-label">Mô tả công việc (*)</label>
                 <textarea
                   className="form-textarea"
                   rows={4}
                   value={jobForm.description}
                   onChange={(e) => setJobForm({ ...jobForm, description: e.target.value })}
-                  placeholder="Mô tả trách nhiệm chính của vị trí, môi trường công việc..."
+                  placeholder="Mô tả trách nhiệm chính của vị trí, môi trường làm việc..."
                   required
                 />
               </div>
@@ -487,21 +492,22 @@ export default function RecruiterView({ currentUser, onShowToast }) {
             <div className="modal-header">
               <div>
                 <h2>Chi tiết ứng viên: {selectedApplicant.candidateName}</h2>
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>
-                  Ứng tuyển vị trí: <strong>{selectedApplicant.jobTitle}</strong>
+                <p>
+                  Ứng tuyển vị trí: {selectedApplicant.jobTitle}
                 </p>
               </div>
-              <button type="button" className="modal-close-btn" onClick={() => setSelectedApplicant(null)}>&times;</button>
+              <button type="button" className="modal-close-btn" onClick={() => setSelectedApplicant(null)} aria-label="Đóng">&times;</button>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+            <div className="modal-body">
               <div>
-                <h4>Thông tin liên hệ & Kỹ năng</h4>
-                <p style={{ fontSize: '0.9rem' }}>📧 Email: {selectedApplicant.candidateEmail}</p>
-                <p style={{ fontSize: '0.9rem' }}>🛠️ Kỹ năng: {selectedApplicant.skillsSummary || 'Chưa cập nhật'}</p>
-                <p style={{ fontSize: '0.9rem', marginTop: '4px' }}>
-                  📄 CV: {selectedApplicant.cvUrl ? (
-                    <a href={selectedApplicant.cvUrl} target="_blank" rel="noreferrer" style={{ color: 'var(--primary)', textDecoration: 'underline' }}>
+                <h4 className="modal-section-title">Thông tin ứng viên</h4>
+                <p style={{ color: 'var(--text-secondary)' }}>Email: {selectedApplicant.candidateEmail}</p>
+                <p style={{ color: 'var(--text-secondary)' }}>Kỹ năng: {selectedApplicant.skillsSummary || 'Chưa cập nhật'}</p>
+                <p style={{ marginTop: '4px' }}>
+                  CV:{' '}
+                  {selectedApplicant.cvUrl ? (
+                    <a href={selectedApplicant.cvUrl} target="_blank" rel="noreferrer" className="badge badge-neutral" style={{ textDecoration: 'underline' }}>
                       Xem tài liệu CV
                     </a>
                   ) : 'Không có'}
@@ -509,14 +515,14 @@ export default function RecruiterView({ currentUser, onShowToast }) {
               </div>
 
               <div>
-                <h4>Thư giới thiệu</h4>
-                <p style={{ fontSize: '0.9rem', background: 'var(--bg)', padding: '10px', borderRadius: '8px', border: '1px solid var(--border)' }}>
+                <h4 className="modal-section-title">Thư giới thiệu</h4>
+                <p style={{ background: 'var(--surface-subtle)', padding: '12px', borderRadius: 'var(--radius-sm)', border: '1px solid var(--border)', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                   {selectedApplicant.coverLetter || 'Ứng viên không gửi thư giới thiệu.'}
                 </p>
               </div>
 
               <div className="form-group">
-                <label className="form-label">Lời nhắn / Phản hồi cho ứng viên (sẽ gửi thông báo)</label>
+                <label className="form-label">Lời nhắn / Phản hồi cho ứng viên</label>
                 <input
                   type="text"
                   className="form-input"
@@ -527,35 +533,35 @@ export default function RecruiterView({ currentUser, onShowToast }) {
               </div>
 
               <div>
-                <h4 style={{ marginBottom: '8px' }}>Chuyển giai đoạn tuyển dụng:</h4>
-                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                <h4 className="modal-section-title">Chuyển giai đoạn tuyển dụng</h4>
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px' }}>
                   <button
                     type="button"
                     className="btn btn-secondary btn-sm"
                     onClick={() => handleAdvanceStatus(selectedApplicant.id, 'REVIEWED')}
                   >
-                    👀 Đã xem hồ sơ
+                    Đã xem hồ sơ
                   </button>
                   <button
                     type="button"
-                    className="btn btn-primary btn-sm"
+                    className="btn btn-accent btn-sm"
                     onClick={() => handleAdvanceStatus(selectedApplicant.id, 'INTERVIEW')}
                   >
-                    🎯 Mời phỏng vấn
+                    Mời phỏng vấn
                   </button>
                   <button
                     type="button"
                     className="btn btn-success btn-sm"
                     onClick={() => handleAdvanceStatus(selectedApplicant.id, 'OFFER')}
                   >
-                    🏆 Gửi Offer
+                    Gửi Offer
                   </button>
                   <button
                     type="button"
                     className="btn btn-danger btn-sm"
                     onClick={() => handleAdvanceStatus(selectedApplicant.id, 'REJECTED')}
                   >
-                    ✕ Từ chối
+                    Từ chối
                   </button>
                 </div>
               </div>
@@ -566,3 +572,4 @@ export default function RecruiterView({ currentUser, onShowToast }) {
     </div>
   );
 }
+

@@ -8,33 +8,33 @@ export default function JobDetailModal({ job, onClose, onApply, onReport, hasApp
       <div className="modal-card" onClick={(e) => e.stopPropagation()}>
         <div className="modal-header">
           <div>
-            <h2 style={{ fontSize: '1.25rem' }}>{job.title}</h2>
-            <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
-              🏢 {job.companyName} • 📍 {job.location} • 💼 {job.employmentType}
+            <h2>{job.title}</h2>
+            <p>
+              {job.companyName} • {job.location} • {job.employmentType}
             </p>
           </div>
-          <button type="button" className="modal-close-btn" onClick={onClose}>&times;</button>
+          <button type="button" className="modal-close-btn" onClick={onClose} aria-label="Đóng">&times;</button>
         </div>
 
         <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <span className="job-salary-badge" style={{ fontSize: '1.1rem' }}>
-            💰 {job.salaryText || 'Thỏa thuận'}
+          <span className="job-salary-badge">
+            {job.salaryText || 'Thỏa thuận'}
           </span>
           <span className="badge badge-primary">{job.experienceLevel}</span>
         </div>
 
-        <div className="modal-body" style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+        <div className="modal-body">
           <div>
-            <h4 style={{ marginBottom: '6px' }}>Mô tả công việc</h4>
-            <p style={{ fontSize: '0.9rem', color: 'var(--text-main)', whiteSpace: 'pre-line' }}>
+            <h4 className="modal-section-title">Mô tả công việc</h4>
+            <p style={{ color: 'var(--text-secondary)', lineHeight: '1.6', whiteSpace: 'pre-line' }}>
               {job.description}
             </p>
           </div>
 
           {job.requirements && job.requirements.length > 0 && (
             <div>
-              <h4 style={{ marginBottom: '6px' }}>Yêu cầu ứng viên</h4>
-              <ul style={{ paddingLeft: '20px', fontSize: '0.9rem', color: 'var(--text-main)' }}>
+              <h4 className="modal-section-title">Yêu cầu ứng viên</h4>
+              <ul style={{ paddingLeft: '18px', color: 'var(--text-secondary)', lineHeight: '1.6' }}>
                 {job.requirements.map((req, idx) => (
                   <li key={idx} style={{ marginBottom: '4px' }}>{req}</li>
                 ))}
@@ -43,10 +43,10 @@ export default function JobDetailModal({ job, onClose, onApply, onReport, hasApp
           )}
 
           <div>
-            <h4 style={{ marginBottom: '6px' }}>Kỹ năng yêu cầu</h4>
+            <h4 className="modal-section-title">Kỹ năng yêu cầu</h4>
             <div className="skills-tags">
               {job.skillsRequired?.map((skill, index) => (
-                <span key={index} className="skill-tag" style={{ background: 'var(--primary-light)', color: 'var(--primary-text)', fontWeight: 600 }}>
+                <span key={index} className="skill-tag">
                   {skill}
                 </span>
               ))}
@@ -63,7 +63,7 @@ export default function JobDetailModal({ job, onClose, onApply, onReport, hasApp
               onReport(job);
             }}
           >
-            🚩 Báo cáo tin vi phạm
+            Báo cáo tin
           </button>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button type="button" className="btn btn-secondary" onClick={onClose}>Đóng</button>
@@ -76,7 +76,7 @@ export default function JobDetailModal({ job, onClose, onApply, onReport, hasApp
                 onApply(job);
               }}
             >
-              {hasApplied ? '✓ Đã nộp hồ sơ' : '⚡ Ứng tuyển ngay'}
+              {hasApplied ? 'Đã nộp hồ sơ' : 'Ứng tuyển ngay'}
             </button>
           </div>
         </div>
@@ -84,3 +84,4 @@ export default function JobDetailModal({ job, onClose, onApply, onReport, hasApp
     </div>
   );
 }
+

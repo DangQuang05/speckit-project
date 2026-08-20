@@ -77,23 +77,44 @@ backend/
 
 frontend/
 ├── src/
-│   ├── assets/
+│   ├── auth/
+│   │   ├── authStorage.js
+│   │   ├── GuestRoute.jsx
+│   │   └── ProtectedRoute.jsx
 │   ├── components/
-│   ├── features/
-│   ├── hooks/
+│   │   ├── ApplyModal.jsx
+│   │   ├── Header.jsx
+│   │   ├── JobCard.jsx
+│   │   ├── JobDetailModal.jsx
+│   │   ├── LogoutControl.jsx
+│   │   ├── NotificationsDrawer.jsx
+│   │   ├── ReportModal.jsx
+│   │   └── Toast.jsx
 │   ├── pages/
+│   │   ├── AdminView.jsx
+│   │   ├── CandidateDashboard.jsx
+│   │   ├── CandidateView.jsx
+│   │   ├── LoginPage.jsx
+│   │   ├── ModeratorView.jsx
+│   │   ├── RecruiterView.jsx
+│   │   └── RegisterPage.jsx
 │   ├── services/
-│   ├── styles/
-│   ├── types/
-│   └── App.jsx
-├── public/
+│   │   └── api.js
+│   ├── App.css
+│   ├── App.jsx
+│   ├── index.css
+│   └── main.jsx
 ├── package.json
 ├── vite.config.js
-├── index.html
-└── tests/
-    ├── unit/
-    └── integration/
+└── index.html
 ```
+
+## UI/UX Design System (Taste Skill Compliance)
+
+- **Archetype**: Minimalist SaaS (Linear / Vercel design philosophy).
+- **Design Tokens**: Defined in `frontend/src/index.css` with CSS custom properties for neutral scales (`#fafafa`, `#ffffff`, `#e5e5e5`, `#171717`, `#525252`, `#737373`), single accent `#2563eb`, and crisp semantic indicators.
+- **Component Standard**: All inline styles eliminated; UI components use structured CSS classes, segment controls, subtle badges, uppercase table headers, and backdrop-filter modals.
+- **Typography & Iconography**: Google Fonts Inter with tight heading tracking, zero emoji clutter in buttons/headers, and accessible text labels.
 
 **Structure Decision**: Split the application into separate frontend and backend projects under a shared monorepo root. This matches the stated stack, keeps concerns isolated, and simplifies role-based logic and API contracts.
 
@@ -102,3 +123,4 @@ frontend/
 > **Fill ONLY if Constitution Check has violations that must be justified**
 
 No constitution violations identified. The selected architecture remains within the project quality, performance, and simplicity standards.
+

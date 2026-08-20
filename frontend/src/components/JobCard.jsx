@@ -17,19 +17,19 @@ export default function JobCard({ job, onViewDetails, onApply, onReport, hasAppl
       <div className="job-item-header">
         <div>
           <h3 className="job-item-title">{job.title}</h3>
-          <div className="job-item-company">
-            <span>🏢 {job.companyName}</span>
+          <div className="job-item-meta">
+            <strong>{job.companyName}</strong>
             <span>•</span>
-            <span>📍 {job.location}</span>
+            <span>{job.location}</span>
             <span>•</span>
-            <span>💼 {job.employmentType}</span>
+            <span>{job.employmentType}</span>
             {getLevelBadge(job.experienceLevel)}
           </div>
         </div>
         <span className="job-salary-badge">{job.salaryText || 'Thỏa thuận'}</span>
       </div>
 
-      <p className="job-desc" style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>
+      <p className="job-desc">
         {job.description}
       </p>
 
@@ -39,14 +39,13 @@ export default function JobCard({ job, onViewDetails, onApply, onReport, hasAppl
         ))}
       </div>
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '4px' }}>
+      <div className="job-card-actions">
         <button
           type="button"
           className="btn btn-secondary btn-sm"
           onClick={() => onReport && onReport(job)}
-          style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}
         >
-          🚩 Báo cáo tin
+          Báo cáo tin
         </button>
 
         <div style={{ display: 'flex', gap: '8px' }}>
@@ -63,10 +62,11 @@ export default function JobCard({ job, onViewDetails, onApply, onReport, hasAppl
             disabled={hasApplied}
             onClick={() => onApply(job)}
           >
-            {hasApplied ? '✓ Đã ứng tuyển' : '⚡ Ứng tuyển ngay'}
+            {hasApplied ? 'Đã ứng tuyển' : 'Ứng tuyển ngay'}
           </button>
         </div>
       </div>
     </article>
   );
 }
+

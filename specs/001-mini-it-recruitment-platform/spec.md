@@ -126,10 +126,32 @@ An admin can manage system-wide settings, approve or deactivate recruiters, revi
 - **SC-004**: The platform supports at least 95% completion of critical onboarding and apply flows for first-time users through clear validation and feedback.
 - **SC-005**: Access to privileged actions is correctly restricted so unauthorized users cannot manage or view sensitive recruiter or admin data.
 
-## Assumptions
-
-- Users have access to a modern web browser and stable internet connectivity for profile creation, job search, and application submission.
-- The first release focuses on web-based functionality for the core recruitment workflow rather than mobile-first native apps.
-- Existing identity or authentication infrastructure may be introduced later; in v1, the system can use a standard account model with role-based access control.
-- The platform targets the Vietnamese IT labor market and should accommodate local hiring expectations, cities, and salary conventions.
 - Moderation and admin workflows are required from the beginning because trust and governance are essential to recruitment marketplace credibility.
+
+---
+
+## UI/UX Design System Specification (Minimalist SaaS Standards)
+
+Following the Taste Skill principles (`design-taste-frontend`, `minimalist-ui`, `redesign-existing-projects`):
+
+- **Design Archetype**: Minimalist SaaS (editorial style, restrained aesthetic, clear visual hierarchy).
+- **Calibration Dials**:
+  - **Design Variance**: 3/10 (clean, focused layout, centered content structure)
+  - **Motion Intensity**: 2/10 (subtle hover & state transitions, 0.15s ease)
+  - **Visual Density**: 4/10 (generous whitespace, 8px spacing grid, comfortable breathing room)
+- **Color Tokens**:
+  - Background: `#fafafa`
+  - Surface / Card: `#ffffff` with subtle border `1px solid #e5e5e5`
+  - Text Primary: `#171717`, Text Secondary: `#525252`, Text Muted: `#737373`
+  - Accent / Primary: `#2563eb` (single clean blue accent, zero distracting gradients)
+  - Semantic Statuses: Success (`#16a34a`), Warning (`#d97706`), Danger (`#dc2626`), Purple (`#7c3aed`)
+- **Typography**: Inter sans-serif font scale, tight letter-spacing for headings (`-0.02em` to `-0.03em`), high legibility.
+- **Iconography & Copy**: Professional text labels and clean badges. Zero emoji clutter in buttons, tabs, headers, and form labels.
+- **Component Hierarchy**:
+  - Segment / pill tab bar (`.tabs-nav`, `.tab-btn`)
+  - Subtle badges (`.badge`, `.badge-primary`, `.badge-success`, `.badge-warning`, `.badge-danger`, `.badge-purple`)
+  - Clean data tables with uppercase subtle headers (`.data-table`)
+  - Blurred backdrop modal cards with structured body sections (`.modal-overlay`, `.modal-card`)
+  - Minimalist floating toast notifications (`.toast`)
+  - Accessible forms with focus rings and clear error feedback
+

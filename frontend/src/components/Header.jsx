@@ -6,7 +6,7 @@ export default function Header({ currentRole, currentUser, unreadCount, onToggle
       <div className="header-inner">
         <div className="brand">
           <span className="brand-badge">IT</span>
-          <span>TalentHub Việt Nam</span>
+          <span>TalentHub Vietnam</span>
         </div>
 
         <div className="role-label" aria-label="Vai trò hiện tại">{currentRole}</div>
@@ -18,11 +18,12 @@ export default function Header({ currentRole, currentUser, unreadCount, onToggle
             onClick={onToggleNotifications}
             title="Thông báo"
           >
-            🔔 Thông báo {unreadCount > 0 && <span className="badge badge-danger">{unreadCount}</span>}
+            <span>Thông báo</span>
+            {unreadCount > 0 && <span className="badge badge-primary">{unreadCount}</span>}
           </button>
           <div className="user-badge">
             <span className="user-avatar">{currentUser?.fullName?.charAt(0) || 'U'}</span>
-            <span><strong>{currentUser?.fullName || 'User'}</strong></span>
+            <span>{currentUser?.fullName || 'User'}</span>
           </div>
           {logoutControl}
         </div>
@@ -30,3 +31,4 @@ export default function Header({ currentRole, currentUser, unreadCount, onToggle
     </header>
   );
 }
+
